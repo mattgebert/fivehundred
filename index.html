@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="static/CSS-Playing-Cards/cards.css"/>
+</head>
+<body>
+  <ul id="playerHand" class="hand">
+
+  </ul>
+
+  <button>Test</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+  <script>
+    // var socket = io.connect('0.0.0.0:8082');
+    // var socket = io.connect('http://[0:0:0:0:0:0]:8082');
+    var socket = io.connect('127.0.0.5:8082');
+    alert(socket.connected);
+
+
+  </script>
+
+
+  <!-- <script src="static/dbest-ca/draw_hands.js"></script>
+  <script>fillHand("showtens", "CDSH", {H:"TTTTTTTTTT" , C:"" , D:"" , S:"" , J:"1"} );</script-->
+</body>
+</html>
