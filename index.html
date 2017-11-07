@@ -8,15 +8,26 @@
 
   </ul>
 
-  <button>Test</button>
+  <input id="clickMe" type="button" value="Test" onclick="joinGame();" />
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+
   <script>
-    // var socket = io.connect('0.0.0.0:8082');
-    // var socket = io.connect('http://[0:0:0:0:0:0]:8082');
-    var socket = io.connect('127.0.0.5:8082');
-    alert(socket.connected);
+      var socket = io();
 
+      var joinGame = function() {
+        socket.emit('joinGame');
+      };
 
+      socket.on('addHand', function(hand) {
+        var h = $('#playerHand');
+        h.html("");
+        hand.forEach(function(e){
+          h.append("<li><a class =\"card rank-" + e.rank.css + " " + e.suit.css + " href=\"#\"><span class=\"rank\">"+e.rank.css+"</span><span class=\"suit\">&"+e.suit.css+";</span>\n</a></li>");
+          alert(e.rank);
+        });
+      });
   </script>
 
 

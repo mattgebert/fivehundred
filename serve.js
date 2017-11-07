@@ -1,15 +1,40 @@
 "use strict";
 //---------------------------------------------------------------------
 //Static Resource Server:
-var express = require('express');
-var app = express();
-app.use(express.static(__dirname + '/www'));
+var app = require('express')();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
 
-var server = app.listen(8082, '127.0.0.5', function() {
+app.get('/', function(req,res) {
+	res.sendFile(__dirname + '/index.html');
+});
+
+// Server Setup for a new player:
+var server = http.listen(3000, 'localhost', function() {
 	var port = server.address().port;
 	var ip = server.address().address;
 	console.log('Server running at address %s', ip);
 	console.log('Server running at port %s', port);
+});
+
+//Responses to clients:
+io.on('connection', function(socket){
+	console.log('User Connected');
+
+	socket.on('joinGame', function(player) {
+		console.log("Yep!");
+		// console.log(player.id + ' joined the game');
+
+		//Deal New Deck:
+		var newdeck = new fivehundredDeck();
+		var newhand = newdeck.dealRandomCards(10);
+		socket.emit('addHand', newhand);
+
+	});
+
+	socket.on('disconnect', function(){
+  	console.log('User Disconnected');
+	});
 });
 
 //---------------------------------------------------------------------
@@ -37,67 +62,57 @@ var rankEnum = Object.freeze({
 	ace : 	{val: 14, css:'a'},
 });
 
-class card {
-	constructor(rank, suit){
-		this.rank = rank;
-		this.suit = suit;
-	}
+function Card(rank,suit) {
+	this._rank = rank;
+	this._suit = suit;
 }
+
+Card.prototype = {
+	get suit() {
+		return this._suit;
+	},
+	get rank() {
+		return this._rank;
+	}
+};
+
 var jokerCard = Object.freeze(
-	new card(
+	new Card(
 		{val: 15, css: 'big joker'},
 		{val: 4, css: ''} //No text for css
 	)
 );
 
-//Setup server decks
-class fivehundredDeck {
-	constructor(){ //n = number players
-		n=3; //TODO: Remove Constant
 
-		//Add regular 3 player cards:
-		this.cards = [];
-		for (var suit in suitEnum) {
-			for (var rank in rankEnum) {
-				if (rank.val > 6)
-					this.cards.push(new card(rank, suit));
+var c = new Card({val: 13, css:'k'},{val: 3, css:'hearts'});
+console.log(c.suit);
+
+//Setup server decks
+function fivehundredDeck() {
+
+	//Add regular 3 player cards:
+	this.cards = [];
+	for (var suit in suitEnum) {
+		for (var rank in rankEnum) {
+			if (rankEnum[rank].val > 6){
+				this.cards.push(new Card(rankEnum[rank], suitEnum[suit]));
 			}
 		}
-		this.cards.push(jokerCard);
-
-		//Dealing Hand Tracking:
-		this.handsLeft = n;
 	}
+	this.cards.push(jokerCard);
+};
 
+fivehundredDeck.prototype = {
 	//Deals out random cards:
-	dealRandomCards(n) {
+	dealRandomCards: function(n) {
 		var len = this.cards.length;
 		//Remove random cards from the deck.
 		var retCards = [];
 		for (var i = 0; i < n; i++) {
 			retCards.push(this.cards.splice(Math.floor(Math.random()*len), 1));
 			len = len - 1;
+			console.log(retCards[i].rank + " " + retCards[i].suit)
 		};
 		return retCards;
 	}
 };
-
-
-//Server Setup for a new player:
-var io = require('socket.io').listen(server);
-io.on('connnection', function(client){
-	console.log('User Connected');
-
-	client.on('joinGame', function(player) {
-		console.log("Yep!");
-		//console.log(player.id + ' joined the game');
-
-		//Deal New Deck:
-		var newdeck = new fivehundredDeck();
-		var newhand = newdeck.dealRandomCards();
-
-		client.emit('addHand', {id: player.id, isLocal: true, hand: newhand});
-		//client.broadcast.emit('addTank', {id: tank.id, type: tank.type, isLocal: false, x:initX, y:initY, hp: TANK_INIT_HP});
-		//game.addTank({id:tank.id type: tank.type, hp: TANK_INIT_HP});
-	});
-});
