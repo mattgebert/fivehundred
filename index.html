@@ -14,18 +14,23 @@
   <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
 
   <script>
-      var socket = io();
+      var socket = io('localhost:3000');
 
       var joinGame = function() {
         socket.emit('joinGame');
       };
 
+      function capitalizeFirstLetter(string) {
+        alert(string.charAt(0).toUpperCase() + string.slice(1));
+          return string.charAt(0).toUpperCase() + string.slice(1);
+      }
+
       socket.on('addHand', function(hand) {
         var h = $('#playerHand');
         h.html("");
         hand.forEach(function(e){
-          h.append("<li><a class =\"card rank-" + e.rank.css + " " + e.suit.css + " href=\"#\"><span class=\"rank\">"+e.rank.css+"</span><span class=\"suit\">&"+e.suit.css+";</span>\n</a></li>");
-          alert(e.rank);
+          h.append("<li><a class =\"card rank-" + e.rank.css + " " + e.suit.css + "\" href=\"#\"><span class=\"rank\">"+capatalizeFirstLetter(e.rank.css)+"</span><span class=\"suit\">&"+e.suit.css+";</span>\n</a></li>");
+          // console.log(e.rank);
         });
       });
   </script>

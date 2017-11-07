@@ -22,7 +22,6 @@ io.on('connection', function(socket){
 	console.log('User Connected');
 
 	socket.on('joinGame', function(player) {
-		console.log("Yep!");
 		// console.log(player.id + ' joined the game');
 
 		//Deal New Deck:
@@ -63,18 +62,9 @@ var rankEnum = Object.freeze({
 });
 
 function Card(rank,suit) {
-	this._rank = rank;
-	this._suit = suit;
+	this.rank = rank;
+	this.suit = suit;
 }
-
-Card.prototype = {
-	get suit() {
-		return this._suit;
-	},
-	get rank() {
-		return this._rank;
-	}
-};
 
 var jokerCard = Object.freeze(
 	new Card(
@@ -89,7 +79,6 @@ console.log(c.suit);
 
 //Setup server decks
 function fivehundredDeck() {
-
 	//Add regular 3 player cards:
 	this.cards = [];
 	for (var suit in suitEnum) {
@@ -108,11 +97,13 @@ fivehundredDeck.prototype = {
 		var len = this.cards.length;
 		//Remove random cards from the deck.
 		var retCards = [];
+		console.log("Cards Dealt:")
 		for (var i = 0; i < n; i++) {
-			retCards.push(this.cards.splice(Math.floor(Math.random()*len), 1));
+			retCards.push(this.cards.splice(Math.floor(Math.random()*len), 1)[0]);
 			len = len - 1;
-			console.log(retCards[i].rank + " " + retCards[i].suit)
+			console.log(retCards[i].rank.val + " " + retCards[i].suit.css)
 		};
+		console.log("\n");
 		return retCards;
 	}
 };
